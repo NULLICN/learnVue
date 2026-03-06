@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+button {
+    @apply border m-0.5 p-0.5 
+}
+
+body {
+    background-color: #979797;
+}

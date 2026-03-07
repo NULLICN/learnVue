@@ -1,5 +1,13 @@
 # learnVue
 
+<a href="https://github.com/NULLICN/learnVue/commits/main">
+  <img src="https://img.shields.io/github/last-commit/NULLICN/learnVue?style=flat"
+       alt="Last Commit" 
+       height="16" 
+       style="border: none;">
+</a>
+
+
 This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup

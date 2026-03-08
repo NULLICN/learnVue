@@ -1,13 +1,26 @@
 <script setup lang="ts">
-import { computed, reactive, ref, useTemplateRef, watch, watchEffect, watchPostEffect, provide } from 'vue'
+import {
+  computed,
+  defineAsyncComponent,
+  provide,
+  reactive,
+  ref,
+  useTemplateRef,
+  watch,
+  watchEffect,
+  watchPostEffect,
+  type Component,
+} from 'vue'
 
+import CompoAsyncError from './components/Compo_Async_Error.vue'
+import CompoAsyncLoading from './components/Compo_Async_Loading.vue'
 import Compo_Attr from './components/Compo_Attr.vue'
+import CompoDependantInject from './components/Compo_DependantInject.vue'
 import Compo_Slot from './components/Compo_Slot.vue'
 import Compo_Tabs from './components/Compo_Tabs.vue'
 import Compo_Vmode from './components/Compo_Vmode.vue'
 import ContentCompo from './components/ContentCompo.vue'
 import PropsFromObj from './components/PropsFromObj.vue'
-import CompoDependantInject from './components/Compo_DependantInject.vue'
 
 import { usePublicVariation } from './composables/usePublicVariation.ts'
 
@@ -163,7 +176,44 @@ const slotPropsFromParent = reactive({
 
 provide('injectedValue', '这是通过provide/inject传递的值')
 
+const isAsyncComponentLoaded = ref(false)
+const CompoAsync = defineAsyncComponent({
+  loader: async () => {
+    // 封装延迟函数（可控制成功/失败）
+    const delay = (ms: number, isFail = true) => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          isFail ? reject(new Error('模拟加载失败')) : resolve(import('./components/Compo_Async.vue'))
+        }, ms)
+      })
+    }
 
+    // try {
+      // 延迟2000ms后模拟失败
+      const result =await delay(2000, true) as Component
+      // 如果上面没失败，才加载组件
+      return result
+  //   } catch (err) {
+  //     console.error('[捕获]异步加载组件失败，原因：', err)
+  //     // 重新抛出错误，让Vue渲染errorComponent
+  //     throw err
+  //   }
+  },
+  loadingComponent: CompoAsyncLoading,
+  errorComponent: CompoAsyncError,
+  delay: 0,
+  // timeout: 6000,
+  onError: (err, retry, fail, attempts) => {
+    console.error(`[onError]异步加载组件失败，原因：${err}，尝试次数：${attempts}`)
+    if (attempts <= 0) {
+      // 重试加载
+      retry()
+    } else {
+      // 超过重试次数，显示错误组件
+      fail()
+    }
+  },
+})
 </script>
 
 <template>
@@ -293,13 +343,13 @@ provide('injectedValue', '这是通过provide/inject传递的值')
   </Compo_Slot>
 
   <p>默认作用域插槽</p>
-  <Compo_Slot v-slot="{msg, count}">
+  <Compo_Slot v-slot="{ msg, count }">
     {{ msg + ' ' + slotPropsFromParent.msg }}, {{ count }}
   </Compo_Slot>
 
   <p>具名作用域插槽与默认作用域插槽</p>
   <Compo_Slot>
-    <template #section1="{msg, count}">
+    <template #section1="{ msg, count }">
       <p>这是具名插槽section1的内容，来自组件内的：{{ msg }}, {{ count }}</p>
     </template>
 
@@ -310,6 +360,13 @@ provide('injectedValue', '这是通过provide/inject传递的值')
 
   <p>依赖注入</p>
   <CompoDependantInject />
+
+  <div>
+    <button @click="isAsyncComponentLoaded = !isAsyncComponentLoaded">异步加载一个组件</button>
+    <div class="h-8 border">
+      <CompoAsync v-if="isAsyncComponentLoaded" />
+    </div>
+  </div>
 
   <p>
     组合式函数

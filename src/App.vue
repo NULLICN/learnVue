@@ -12,6 +12,7 @@ import {
   type Component,
 } from 'vue'
 
+// 组件引入
 import CompoAsyncError from './components/Compo_Async_Error.vue'
 import CompoAsyncLoading from './components/Compo_Async_Loading.vue'
 import Compo_Attr from './components/Compo_Attr.vue'
@@ -21,9 +22,12 @@ import Compo_Tabs from './components/Compo_Tabs.vue'
 import Compo_Vmode from './components/Compo_Vmode.vue'
 import ContentCompo from './components/ContentCompo.vue'
 import PropsFromObj from './components/PropsFromObj.vue'
+import CompoTransition from './components/Compo_Transition.vue'
 
+// 组合式函数引入
 import { usePublicVariation } from './composables/usePublicVariation.ts'
 import { vHighlight } from './directives/useVHighlight.ts'
+
 
 const dynamicVariation = ref('dynamicVariation')
 const publicVariation = usePublicVariation(dynamicVariation)
@@ -184,21 +188,23 @@ const CompoAsync = defineAsyncComponent({
     const delay = (ms: number, isFail = true) => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          isFail ? reject(new Error('模拟加载失败')) : resolve(import('./components/Compo_Async.vue'))
+          isFail
+            ? reject(new Error('模拟加载失败'))
+            : resolve(import('./components/Compo_Async.vue'))
         }, ms)
       })
     }
 
     // try {
-      // 延迟2000ms后模拟失败
-      const result =await delay(2000, false) as Component
-      // 如果上面没失败，才加载组件
-      return result
-  //   } catch (err) {
-  //     console.error('[捕获]异步加载组件失败，原因：', err)
-  //     // 重新抛出错误，让Vue渲染errorComponent
-  //     throw err
-  //   }
+    // 延迟2000ms后模拟失败
+    const result = (await delay(2000, false)) as Component
+    // 如果上面没失败，才加载组件
+    return result
+    //   } catch (err) {
+    //     console.error('[捕获]异步加载组件失败，原因：', err)
+    //     // 重新抛出错误，让Vue渲染errorComponent
+    //     throw err
+    //   }
   },
   loadingComponent: CompoAsyncLoading,
   errorComponent: CompoAsyncError,
@@ -215,6 +221,8 @@ const CompoAsync = defineAsyncComponent({
     }
   },
 })
+
+
 </script>
 
 <template>
@@ -374,9 +382,11 @@ const CompoAsync = defineAsyncComponent({
     <button @click="dynamicVariation += ' str'">dynamic</button>
   </p>
 
-  <p v-highlight>
-    自定义指令
-  </p>
+  <p v-highlight>自定义指令</p>
+
+  <CompoTransition />
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

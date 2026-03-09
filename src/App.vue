@@ -23,6 +23,7 @@ import ContentCompo from './components/ContentCompo.vue'
 import PropsFromObj from './components/PropsFromObj.vue'
 
 import { usePublicVariation } from './composables/usePublicVariation.ts'
+import { vHighlight } from './directives/useVHighlight.ts'
 
 const dynamicVariation = ref('dynamicVariation')
 const publicVariation = usePublicVariation(dynamicVariation)
@@ -190,7 +191,7 @@ const CompoAsync = defineAsyncComponent({
 
     // try {
       // 延迟2000ms后模拟失败
-      const result =await delay(2000, true) as Component
+      const result =await delay(2000, false) as Component
       // 如果上面没失败，才加载组件
       return result
   //   } catch (err) {
@@ -371,6 +372,10 @@ const CompoAsync = defineAsyncComponent({
   <p>
     组合式函数
     <button @click="dynamicVariation += ' str'">dynamic</button>
+  </p>
+
+  <p v-highlight>
+    自定义指令
   </p>
 </template>
 

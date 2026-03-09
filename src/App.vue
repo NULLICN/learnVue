@@ -9,6 +9,7 @@ import {
   watch,
   watchEffect,
   watchPostEffect,
+  shallowRef,
   type Component,
 } from 'vue'
 
@@ -23,6 +24,8 @@ import Compo_Vmode from './components/Compo_Vmode.vue'
 import ContentCompo from './components/ContentCompo.vue'
 import PropsFromObj from './components/PropsFromObj.vue'
 import CompoTransition from './components/Compo_Transition.vue'
+import CompoKeepAlive from './components/Compo_KeepAlive.vue'
+import CompoNoKeepAlive from './components/Compo_NoKeepAlive.vue'
 
 // 组合式函数引入
 import { usePublicVariation } from './composables/usePublicVariation.ts'
@@ -222,7 +225,14 @@ const CompoAsync = defineAsyncComponent({
   },
 })
 
+// 1. 用 ref 包裹初始组件，使其成为响应式
+const keepAliveComponent = shallowRef(CompoKeepAlive)
 
+function toggleKeepAliveComponent() {
+  // 2. 通过 .value 赋值更新
+  keepAliveComponent.value = keepAliveComponent.value === CompoKeepAlive
+    ? CompoNoKeepAlive : CompoKeepAlive
+}
 </script>
 
 <template>
@@ -385,6 +395,12 @@ const CompoAsync = defineAsyncComponent({
   <p v-highlight>自定义指令</p>
 
   <CompoTransition />
+
+  <p>组件保活</p>
+  <button @click="toggleKeepAliveComponent">切换组件</button>
+  <KeepAlive include="Compo_KeepAlive">
+    <component :is="keepAliveComponent" />
+  </KeepAlive>
 </template>
 
 <style scoped>

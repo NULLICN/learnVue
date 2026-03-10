@@ -1,24 +1,39 @@
 <script setup lang="ts">
+import { ref, type Component, type ComponentPublicInstance } from 'vue'
+import Archive from './Compo_Archive.vue'
 import Home from './Compo_Home.vue'
 import Posts from './Compo_Posts.vue'
-import Archive from './Compo_Archive.vue'
-import { ref, type Component } from 'vue'
- 
+
+interface ComponentWithCounter {
+  incrementCounter: () => void
+}
+
 const currentTab = ref('Home')
 
 const tabs = {
   Home,
   Posts,
-  Archive
+  Archive,
 } as Record<string, Component>
 
-const tabRefs = {}
+const tabsCount = ref<Record<string, number>>(
+  Object.keys(tabs).reduce(
+    (acc, key) => {
+      acc[key] = 0
+      return acc
+    },
+    {} as Record<string, number>,
+  ),
+)
 
-// 调用子组件方法
-const callChildMethod = () => {
-  // childRef.value 就是子组件实例
-  if (tabRefs[currentTab]?.value) {
-    tabRefs[currentTab].value.incrementCounter() // 调用暴露的方法
+const currentComponentRef = ref<(ComponentPublicInstance & ComponentWithCounter) | null>(null)
+
+function callChildMethod() {
+  if (currentComponentRef.value) {
+    currentComponentRef.value.incrementCounter() // 调用子组件方法
+    if (tabsCount.value[currentTab.value] !== undefined) {
+      tabsCount.value[currentTab.value]!++ // 更新父组件计数
+    }
   }
 }
 </script>
@@ -26,15 +41,30 @@ const callChildMethod = () => {
 <template>
   <div class="demo">
     <button
-       v-for="(_, tab) in tabs"
-       :key="tab"
-       :class="['tab-button', { active: currentTab === tab }]"
-       @click="{currentTab = tab; callChildMethod}"
-       :ref="(el) => {tabRefs[tab] = el}"
-     >
+      v-for="(_, tab) in tabs"
+      :key="tab"
+      :class="['tab-button', { active: currentTab === tab }]"
+      @click="{currentTab = tab; callChildMethod()}"
+    >
       {{ tab }}
     </button>
-	  <component :is="tabs[currentTab]" class="tab"></component>
+    <component :is="tabs[currentTab]" ref="currentComponentRef" class="tab"></component>
+
+    <!-- 计数表 -->
+    <table class="count-table">
+      <thead>
+        <tr>
+          <th>Tab</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(count, tab) in tabsCount" :key="tab">
+          <td>{{ tab }}</td>
+          <td>{{ count }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -69,5 +99,22 @@ const callChildMethod = () => {
 .tab {
   border: 1px solid #ccc;
   padding: 10px;
+}
+
+.count-table {
+  margin-top: 20px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.count-table th,
+.count-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.count-table th {
+  background-color: #f2f2f2;
 }
 </style>

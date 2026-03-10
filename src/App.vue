@@ -26,6 +26,7 @@ import PropsFromObj from './components/PropsFromObj.vue'
 import CompoTransition from './components/Compo_Transition.vue'
 import CompoKeepAlive from './components/Compo_KeepAlive.vue'
 import CompoNoKeepAlive from './components/Compo_NoKeepAlive.vue'
+import CompoTeleport from './components/Compo_Teleport.vue'
 
 // 组合式函数引入
 import { usePublicVariation } from './composables/usePublicVariation.ts'
@@ -401,6 +402,9 @@ function toggleKeepAliveComponent() {
   <KeepAlive include="Compo_KeepAlive">
     <component :is="keepAliveComponent" />
   </KeepAlive>
+
+  <p>Teleport</p>
+  <CompoTeleport />
 </template>
 
 <style scoped>

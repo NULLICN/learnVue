@@ -12,4 +12,4 @@
 
 拉取远端仓库的新代码
 1. git fetch origin main
-2. git pull origin
+2. git pull --rebase origin main

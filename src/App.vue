@@ -37,7 +37,7 @@ const dynamicVariation = ref('dynamicVariation')
 const publicVariation = usePublicVariation(dynamicVariation)
 console.log(publicVariation.variation.value)
 
-const str = ref('hello world')
+const str = ref<string>('hello world')
 const s: string = str.value
 const ob = { c: ref(0), d: ref(1), sr: ref(s) }
 const { c, d, sr } = ob
@@ -47,7 +47,9 @@ const user = reactive({
   device: 'computer',
   num: 0,
 })
-const computed_num = computed(() => {
+
+// 对计算属性进行类型声明
+const computed_num = computed<number>(() => {
   return user.num + 2
 })
 

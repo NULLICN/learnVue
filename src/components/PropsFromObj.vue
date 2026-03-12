@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-const props = defineProps<{
+
+// 声明类型或导入
+interface propsType {
   a: string
   b: number
   c: boolean
@@ -8,7 +10,10 @@ const props = defineProps<{
     d: string
     e: number
   }
-}>()
+}
+
+// 直接使用类型
+const props = defineProps<propsType>()
 
 const objE = ref(props.obj.e)
 const objEComputed = computed(() => props.obj.e + 1)
